@@ -15,8 +15,23 @@ const tipos = {
 };
 
 const App = () => {
-  const [selects, setSelectets] = useState({
+  const initialSelected = {
+    artifacts: false,
+    boss: false,
+    characters: false,
+    consumables: false,
+    domains: false,
+    elements: false,
+    enemies: false,
+    materials: false,
+    nations: false,
+    weapons: false,
+  };
+  const [selects, setSelects] = useState({
     types: [],
+    selected: {
+      ...initialSelected,
+    },
   });
 
   const fetchTypes = async (url, item) => {
@@ -24,9 +39,13 @@ const App = () => {
     const respuesta = await respuestaJson.json();
 
     if (item === "types") {
-      setSelectets({ ...selects, [item]: respuesta[item] });
+      setSelects({ ...selects, [item]: respuesta[item] });
     } else {
-      setSelectets({ ...selects, [item]: respuesta });
+      setSelects({
+        ...selects,
+        [item]: respuesta,
+        selected: { ...initialSelected, [item]: true },
+      });
     }
     console.log(selects);
   };
@@ -36,13 +55,15 @@ const App = () => {
   }, []);
 
   const handleChangeType = ({ target }) => {
-    fetchTypes(`https://api.genshin.dev/${target.value}`, target.value);
+    fetchTypes(`https://api.genshin.dev/${target.value}`, target.value).catch(
+      console.error
+    );
   };
   return (
     <div className="container">
       <h1>Genshin Impact Dex</h1>
       <hr />
-      <select onChange={handleChangeType}>
+      <select name="types" onChange={handleChangeType}>
         <option value="">Seleccione el tipo de material</option>
         {selects.types.map((type) => (
           <option value={type} key={type}>
@@ -50,9 +71,9 @@ const App = () => {
           </option>
         ))}
       </select>
-      {selects.materials && (
+      {selects.selected.materials && (
         <select name="materials">
-          <option value="">Seleccione un artefacto</option>
+          <option value="">Seleccione un material</option>
           {selects.materials.map((material) => (
             <option value={material} key={material}>
               {material}
