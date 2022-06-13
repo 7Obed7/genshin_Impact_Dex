@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import CustomSelect from "./components/CustomSelect";
 import { fetchHelper } from "./helpers/fetchHelper";
 
 const tipos = {
@@ -71,15 +72,19 @@ const App = () => {
           </option>
         ))}
       </select>
+      {selects.selected.artifacts && (
+        <CustomSelect
+          name="artifacts"
+          label="Seleccione un set de artefactos"
+          itemArray={selects.artifacts}
+        />
+      )}
       {selects.selected.materials && (
-        <select name="materials">
-          <option value="">Seleccione un material</option>
-          {selects.materials.map((material) => (
-            <option value={material} key={material}>
-              {material}
-            </option>
-          ))}
-        </select>
+        <CustomSelect
+          name="materials"
+          label="Seleccione un set de materiales"
+          itemArray={selects.materials}
+        />
       )}
     </div>
   );
