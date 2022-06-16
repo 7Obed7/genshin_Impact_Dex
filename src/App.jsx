@@ -30,62 +30,140 @@ const App = () => {
   };
   const [selects, setSelects] = useState({
     types: [],
-    selected: {
+    isSelected: {
       ...initialSelected,
     },
+    selected: {},
   });
 
-  const fetchTypes = async (url, item) => {
+  const fetchTypes = async (item, subItem) => {
+    let url = "https://api.genshin.dev/";
+    if (item !== "types") {
+      url = `https://api.genshin.dev/${item}`;
+    }
+    if (subItem) {
+      url = `https://api.genshin.dev/${item}/${subItem}`;
+    }
+
     const respuestaJson = await fetchHelper(url);
     const respuesta = await respuestaJson.json();
 
-    if (item === "types") {
-      setSelects({ ...selects, [item]: respuesta[item] });
+    if (subItem) {
+      setSelects({ ...selects, selected: respuesta });
     } else {
-      setSelects({
-        ...selects,
-        [item]: respuesta,
-        selected: { ...initialSelected, [item]: true },
-      });
+      if (item === "types") {
+        setSelects({ ...selects, [item]: respuesta[item] });
+      } else {
+        setSelects({
+          ...selects,
+          [item]: respuesta,
+          isSelected: { ...initialSelected, [item]: true },
+        });
+      }
     }
-    console.log(selects);
+
+    console.log(respuesta);
   };
 
   useEffect(() => {
-    fetchTypes("https://api.genshin.dev/", "types").catch(console.error);
+    fetchTypes("types").catch(console.error);
   }, []);
 
   const handleChangeType = ({ target }) => {
-    fetchTypes(`https://api.genshin.dev/${target.value}`, target.value).catch(
-      console.error
-    );
+    fetchTypes(target.value).catch(console.error);
   };
+
   return (
     <div className="container">
       <h1>Genshin Impact Dex</h1>
       <hr />
       <select name="types" onChange={handleChangeType}>
-        <option value="">Seleccione el tipo de material</option>
+        <option value="">Seleccione el tipo de información</option>
         {selects.types.map((type) => (
           <option value={type} key={type}>
             {tipos[type]}
           </option>
         ))}
       </select>
-      {selects.selected.artifacts && (
+      {selects.isSelected.artifacts && (
         <CustomSelect
           name="artifacts"
           label="Seleccione un set de artefactos"
           itemArray={selects.artifacts}
+          fetchTypes={fetchTypes}
         />
       )}
-      {selects.selected.materials && (
+      {selects.isSelected.characters && (
+        <CustomSelect
+          name="characters"
+          label="Seleccione un set de personajes"
+          itemArray={selects.characters}
+          fetchTypes={fetchTypes}
+        />
+      )}
+      {selects.isSelected.consumibles && (
+        <CustomSelect
+          name="consumibles"
+          label="Seleccione un set de consumibles"
+          itemArray={selects.consumibles}
+          fetchTypes={fetchTypes}
+        />
+      )}
+      {selects.isSelected.domains && (
+        <CustomSelect
+          name="domains"
+          label="Seleccione un set de dominios"
+          itemArray={selects.domains}
+          fetchTypes={fetchTypes}
+        />
+      )}
+      {selects.isSelected.elements && (
+        <CustomSelect
+          name="elements"
+          label="Seleccione un set de elementos"
+          itemArray={selects.elements}
+          fetchTypes={fetchTypes}
+        />
+      )}
+      {selects.isSelected.enemies && (
+        <CustomSelect
+          name="enemies"
+          label="Seleccione un set de enemigos"
+          itemArray={selects.enemies}
+          fetchTypes={fetchTypes}
+        />
+      )}
+      {selects.isSelected.materials && (
         <CustomSelect
           name="materials"
           label="Seleccione un set de materiales"
           itemArray={selects.materials}
+          fetchTypes={fetchTypes}
         />
       )}
+      {selects.isSelected.nations && (
+        <CustomSelect
+          name="nations"
+          label="Seleccione un set de naciones"
+          itemArray={selects.nations}
+          fetchTypes={fetchTypes}
+        />
+      )}
+      {selects.isSelected.weapons && (
+        <CustomSelect
+          name="weapons"
+          label="Seleccione un set de armas"
+          itemArray={selects.weapons}
+          fetchTypes={fetchTypes}
+        />
+      )}
+      <hr />
+      <div>
+        {Object.entries(selects.selected).length !== 0 &&
+          Object.entries(selects.selected).map((item) => (
+            <h4>{`${item[0]}: ${item[1]}`}</h4>
+          ))}
+      </div>
     </div>
   );
 };
